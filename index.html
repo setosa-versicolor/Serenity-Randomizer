@@ -288,7 +288,7 @@ svg.icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-w
 @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
 
 /* ---------- Controls ---------- */
-.panelBody { padding: 14px 16px 18px; display: grid; gap: 14px; }
+.panelBody { padding: 14px 16px 18px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
 .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .field { display: grid; gap: 6px; min-width: 0; }
 .field > label, .fieldLabel { font-size: .85rem; font-weight: 700; color: var(--muted); }
@@ -318,10 +318,10 @@ textarea.input { min-height: 132px; resize: vertical; line-height: 1.5; }
 .switch input:checked { background: var(--teal); }
 .switch input:checked::after { transform: translateX(20px); }
 .hint { font-size: .85rem; color: var(--muted); margin: 0; }
-.tagBox { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 56px; padding: 8px; border: 1px solid var(--field-line); border-radius: var(--r-sm); background: var(--field); cursor: text; transition: border-color .2s, box-shadow .2s; }
+.tagBox { min-width: 0; max-height: 340px; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 56px; padding: 8px; border: 1px solid var(--field-line); border-radius: var(--r-sm); background: var(--field); cursor: text; transition: border-color .2s, box-shadow .2s; }
 .tagBox:focus-within { border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-soft); }
-.tag { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; padding: 2px 2px 2px 12px; border-radius: 999px; font-weight: 800; font-size: .95rem; cursor: default; background: color-mix(in srgb, var(--c) 22%, var(--card-strong)); border: 1px solid color-mix(in srgb, var(--c) 55%, transparent); animation: tagIn .28s cubic-bezier(.3, 1.6, .5, 1); }
-.tag .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tag { display: inline-flex; align-items: center; gap: 2px; min-width: 0; max-width: 100%; padding: 6px 2px 6px 12px; border-radius: 18px; font-weight: 800; font-size: .95rem; cursor: default; background: color-mix(in srgb, var(--c) 22%, var(--card-strong)); border: 1px solid color-mix(in srgb, var(--c) 55%, transparent); animation: tagIn .28s cubic-bezier(.3, 1.6, .5, 1); }
+.tag .t { min-width: 0; line-height: 1.25; overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .tag button { flex: none; width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 1.15rem; line-height: 1; }
 .tag button:hover { background: color-mix(in srgb, var(--c) 35%, transparent); color: var(--ink); }
 .tagEntry { display: flex; flex: 1 1 160px; min-width: 0; align-items: center; gap: 6px; }
@@ -548,7 +548,7 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
           <div class="savedLists" id="savedLists" aria-label="Saved lists"></div>
           <div class="field"><label for="listDraft">Your choices</label>
             <div class="tagBox" id="tagBox" role="group" aria-label="List options">
-              <div class="tagEntry"><input class="tagInput" id="listDraft" type="text" maxlength="60" enterkeyhint="enter" autocomplete="off" placeholder="Type an option, press Enter"><button type="button" class="addBtn" id="addTagBtn" hidden>Add</button></div>
+              <div class="tagEntry"><input class="tagInput" id="listDraft" type="text" maxlength="150" enterkeyhint="enter" autocomplete="off" placeholder="Type an option, press Enter"><button type="button" class="addBtn" id="addTagBtn" hidden>Add</button></div>
             </div>
             <textarea id="listItems" data-persist hidden></textarea>
             <div class="hintRow"><p class="hint" id="listHint"></p><button type="button" class="textBtn" id="clearTagsBtn" hidden>Clear all</button></div>
@@ -827,6 +827,8 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
   const diceSize = (n) => (n === 1 ? 112 : n <= 3 ? 86 : n <= 6 ? 66 : n <= 12 ? 52 : 42);
 
   /* ---------- List reel ---------- */
+  // Drop bullet / checkbox / numbering prefixes that come along when pasting from notes apps.
+  const cleanOption = (t) => t.replace(/^\s*(?:[-*•+]\s+)?(?:\[[ xX]?\]\s*)?(?:\d+[.)]\s+)?/, '').trim();
   const TAG_COLORS = ['#ff8a63', '#2fc1b3', '#ffc24b', '#5aa7ff', '#5fcf8a', '#c79bff', '#ff7fb0'];
   const tagColor = (i) => TAG_COLORS[i % TAG_COLORS.length];
 
@@ -1116,7 +1118,7 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
 
     list: {
       title: 'List picker', icon: 'i-list',
-      items() { return $('#listItems').value.split('\n').map((s) => s.trim()).filter(Boolean); },
+      items() { return $('#listItems').value.split('\n').map(cleanOption).filter(Boolean); },
       opts() { return { items: this.items(), n: clamp(int($('#listCount').value, 1), 1, 100), unique: $('#listUnique').checked }; },
       goLabel() { const { n } = this.opts(); return n > 1 ? `Pick ${n}` : 'Pick one'; },
       idle(body) {
@@ -1340,6 +1342,7 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
       return tag;
     });
     entry.before(...tags);
+    if (document.activeElement === $('#listDraft')) box.scrollTop = box.scrollHeight;
     const n = items.length;
     $('#listHint').textContent = n ? `${n} option${n > 1 ? 's' : ''}` : 'Press Enter after each one. Pasting a list works too.';
     $('#clearTagsBtn').hidden = !n;
@@ -1353,7 +1356,7 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
     onListChange();
   }
   function addItems(texts) {
-    const clean = texts.map((t) => t.trim()).filter(Boolean);
+    const clean = texts.map(cleanOption).filter(Boolean);
     if (clean.length) setItems([...MODES.list.items(), ...clean]);
   }
   function commitDraft() {
