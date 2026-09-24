@@ -356,7 +356,6 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
   <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></symbol>
   <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v12M7.5 8 12 3.5 16.5 8"/><path d="M5 12.5v5A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-5"/></symbol>
-  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.5 2.5M15.2 15.2l2.5 2.5M6.3 17.7l2.5-2.5M15.2 8.8l2.5-2.5"/></symbol>
   <symbol id="i-shell" viewBox="0 0 48 48"><path d="M24 40c-9 0-16-6-17-14C6 16 14 8 24 8s18 8 17 18c-1 8-8 14-17 14z"/><path d="M24 40 16 12M24 40l8-28M24 40 10 20M24 40l14-20M24 40V8"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></symbol>
   <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2.5 9c2.4 0 2.4-2 4.75-2S9.6 9 12 9s2.4-2 4.75-2S19.1 9 21.5 9M2.5 15c2.4 0 2.4-2 4.75-2S9.6 15 12 15s2.4-2 4.75-2 2.35 2 4.75 2"/></symbol>
@@ -428,7 +427,7 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
       </section>
 
       <div class="actionBar">
-        <button class="go" id="goBtn"><svg class="icon"><use href="#i-sparkle"/></svg><span id="goLabel">Flip the coin</span></button>
+        <button class="go" id="goBtn"><svg class="icon" aria-hidden="true"><use id="goIcon" href="#i-coin"/></svg><span id="goLabel">Flip the coin</span></button>
         <p class="kbdHint">or press <kbd>Space</kbd></p>
       </div>
     </div>
@@ -922,7 +921,10 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
     else { setCaption(MODES[mode].idle(body)); setShareable(false); }
   }
 
-  function updateGoLabel() { $('#goLabel').textContent = MODES[mode].goLabel(); }
+  function updateGoLabel() {
+    $('#goLabel').textContent = MODES[mode].goLabel();
+    $('#goIcon').setAttribute('href', '#' + MODES[mode].icon);
+  }
 
   function setMode(m, focus) {
     mode = m;
