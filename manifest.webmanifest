@@ -1,0 +1,13 @@
+{
+  "name": "Serenity Randomizer",
+  "short_name": "Serenity",
+  "description": "Flip coins, roll dice, pick numbers and choose from lists, on a calm tropical beach.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#9fdde9",
+  "theme_color": "#5dbfdc",
+  "icons": [
+    { "src": "icon.PNG", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
+  ]
+}
