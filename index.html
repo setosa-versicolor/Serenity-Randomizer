@@ -180,13 +180,15 @@ svg.icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-w
 [data-theme="dark"] .caption.warn { color: var(--coral); }
 .note { display: block; font-size: .85rem; font-weight: 600; margin-top: 2px; }
 
-/* Coin */
-.coinWrap { --cs: 150px; position: relative; width: var(--cs); height: var(--cs); perspective: 800px; cursor: pointer; -webkit-user-select: none; user-select: none; }
-.coinToss { position: absolute; inset: 0; transform-style: preserve-3d; }
-.coin { position: absolute; inset: 0; transform-style: preserve-3d; }
-.coinEdge { position: absolute; inset: 1%; border-radius: 50%; background: #b3761a; }
-.coinEdge:nth-child(even) { background: #dca03a; }
-.face { position: absolute; inset: 0; border-radius: 50%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3%; padding: 22% 20% 16%; text-align: center; }
+/* Coin: drawn in 2D (squash + face swap + edge band) so it looks identical in every browser. */
+.coinWrap { --cs: 150px; position: relative; width: var(--cs); height: var(--cs); cursor: pointer; -webkit-user-select: none; user-select: none; }
+.coinToss, .coin { position: absolute; inset: 0; }
+.coinRim {
+  position: absolute; left: 0; right: 0; top: 0; height: 100%; border-radius: 50%;
+  background: repeating-linear-gradient(90deg, rgba(110, 60, 0, .28) 0 1.5px, transparent 1.5px 4.5px), linear-gradient(180deg, #f3be52, #c5841c 55%, #9a600f);
+}
+.face { position: absolute; inset: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3%; padding: 22% 20% 16%; text-align: center; }
+.coin[data-face="heads"] .back, .coin[data-face="tails"] .front { display: none; }
 .face.front { color: #7a4a06; }
 .face.back { color: #0c524d; }
 .face .art { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -198,12 +200,6 @@ svg.icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-w
 .coinWrap.small .face { padding: 0; }
 .coinShadow { position: absolute; left: 14%; right: 14%; bottom: -13%; height: 10%; border-radius: 50%; background: rgba(0, 30, 40, .25); filter: blur(4px); }
 .coinWrap:hover .coin { transition: translate .2s; translate: 0 -3px; }
-/* At rest the coin is drawn flat: Safari flattens 3D inside the card's rounded clip,
-   which would hide both faces. Only the tossing coin uses real 3D. */
-.coin.rest { transform: none !important; }
-.coin.rest .coinEdge { display: none; }
-.coin.rest .face { transform: none !important; box-shadow: 0 calc(var(--cs) * .04) 0 #b3761a; }
-.coin.rest[data-face="heads"] .back, .coin.rest[data-face="tails"] .front { display: none; }
 .stage.tossing { overflow: visible; }
 .tally { flex-basis: 100%; display: grid; gap: 6px; max-width: 420px; }
 .tallyBar { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--line); }
@@ -776,39 +772,42 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
     s.append(u);
     return s;
   }
-  // A minted coin with real thickness: stacked edge discs between two faces.
-  // It flips end over end (rotateX); 0deg shows heads, 180deg shows tails.
+  // A minted coin, drawn flat: flipping end over end is faked by squashing the face
+  // vertically, swapping faces when it passes edge-on, and a ridged edge band that
+  // shows the coin's thickness. angle 0 shows heads, 180 shows tails.
   function coinNode(heads, tails, size) {
     const wrap = el('div', 'coinWrap' + (size < 80 ? ' small' : ''));
     wrap.style.setProperty('--cs', size + 'px');
     const toss = el('div', 'coinToss'), coin = el('div', 'coin');
-    const thick = Math.max(4, size * 0.075), layers = size >= 100 ? 10 : 5;
-    for (let i = 0; i < layers; i++) {
-      const e = el('div', 'coinEdge');
-      e.style.transform = `translateZ(${(-thick / 2 + (thick * i) / (layers - 1)).toFixed(2)}px)`;
-      coin.append(e);
-    }
-    const face = (cls, art, emb, label, z) => {
+    const face = (cls, art, emb, label) => {
       const f = el('div', 'face ' + cls);
-      f.style.transform = z;
       f.append(svgUse('art', art), svgUse('emb', emb), el('span', 'lbl', label));
       return f;
     };
-    coin.append(
-      face('front', 'coin-heads', 'i-sun', heads, `translateZ(${thick / 2}px)`),
-      face('back', 'coin-tails', 'i-palm', tails, `rotateX(180deg) translateZ(${thick / 2}px)`),
-    );
+    coin.append(el('div', 'coinRim'), face('front', 'coin-heads', 'i-sun', heads), face('back', 'coin-tails', 'i-palm', tails));
+    coin.size = size;
     toss.append(coin);
     wrap.append(el('div', 'coinShadow'), toss);
     return wrap;
   }
+  function setCoinAngle(coin, deg) {
+    const size = coin.size, rad = (deg * Math.PI) / 180, c = Math.cos(rad);
+    const h = size * Math.max(Math.abs(c), 0.02);
+    // Edge offset: the coin's thickness swinging with the flip, plus a slight
+    // downward view so a resting coin still shows its rim.
+    const e = size * (0.075 * Math.sin(rad) + 0.04);
+    const faceName = c >= 0 ? 'heads' : 'tails';
+    if (coin.dataset.face !== faceName) coin.dataset.face = faceName;
+    const [rim, front, back] = coin.children, f = faceName === 'heads' ? front : back;
+    f.style.transform = `scaleY(${(h / size).toFixed(4)})`;
+    f.style.filter = `brightness(${(0.72 + 0.28 * Math.abs(c)).toFixed(3)})`;
+    rim.style.top = ((size - h) / 2 + Math.min(0, e)).toFixed(2) + 'px';
+    rim.style.height = (h + Math.abs(e)).toFixed(2) + 'px';
+    rim.style.borderRadius = `50% / ${(h / 2).toFixed(2)}px`;
+  }
   // Which face each coin last showed, so the next toss starts from it.
   const coinShowing = [];
-  function restCoin(coin, deg) {
-    coin.style.transform = `rotateX(${deg}deg)`;
-    coin.dataset.face = deg === 0 ? 'heads' : 'tails';
-    coin.classList.add('rest');
-  }
+  const restCoin = setCoinAngle;
 
   function dieNode(sides, value, size) {
     const wrap = el('div', 'dieWrap');
@@ -954,8 +953,8 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
           const coin = w.querySelector('.coin'), toss = w.querySelector('.coinToss'), shadow = w.firstChild;
           const final = r.flips[i] ? 0 : 180, from = coinShowing[i] || 0;
           coinShowing[i] = final;
+          restCoin(coin, from);
           if (still) { restCoin(coin, final); return null; }
-          coin.style.transform = `rotateX(${final}deg)`;
           const D = (n === 1 ? 1600 : 1250) + i * 60, delay = i * 60;
           const H = size * (n === 1 ? 1.1 : 0.9), tilt = (Math.random() - 0.5) * 30;
           const end = from + 360 * (n === 1 ? 4 : 3) + ((final - from + 360) % 360);
@@ -969,14 +968,15 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
             { transform: 'translateY(0) scale(1) rotateZ(0deg)', offset: 0.9 },
             { transform: 'translateY(0) scale(1) rotateZ(0deg)' },
           ], opts);
-          coin.animate([
-            { transform: `rotateX(${from}deg) rotateY(0deg)`, easing: 'cubic-bezier(.3,.5,.45,1)' },
-            { transform: `rotateX(${end}deg) rotateY(0deg)`, offset: 0.72 },
-            { transform: `rotateX(${end + 10}deg) rotateY(8deg)`, offset: 0.8 },
-            { transform: `rotateX(${end - 5}deg) rotateY(-5deg)`, offset: 0.88 },
-            { transform: `rotateX(${end + 2}deg) rotateY(2deg)`, offset: 0.95 },
-            { transform: `rotateX(${end}deg) rotateY(0deg)` },
-          ], opts);
+          const t0 = performance.now() + delay;
+          (function frame(now) {
+            const p = Math.max(0, Math.min(1, (now - t0) / D));
+            let deg;
+            if (p < 0.72) deg = from + (end - from) * (1 - Math.pow(1 - p / 0.72, 1.7));
+            else { const q = (p - 0.72) / 0.28; deg = end + 14 * Math.sin(q * Math.PI * 3) * Math.pow(1 - q, 1.6); }
+            setCoinAngle(coin, deg);
+            if (p < 1) requestAnimationFrame(frame);
+          })(performance.now());
           shadow.animate([
             { transform: 'scale(1)', opacity: 1 },
             { transform: 'scale(.45)', opacity: 0.3, offset: 0.4 },
