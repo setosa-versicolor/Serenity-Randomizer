@@ -198,6 +198,12 @@ svg.icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-w
 .coinWrap.small .face { padding: 0; }
 .coinShadow { position: absolute; left: 14%; right: 14%; bottom: -13%; height: 10%; border-radius: 50%; background: rgba(0, 30, 40, .25); filter: blur(4px); }
 .coinWrap:hover .coin { transition: translate .2s; translate: 0 -3px; }
+/* At rest the coin is drawn flat: Safari flattens 3D inside the card's rounded clip,
+   which would hide both faces. Only the tossing coin uses real 3D. */
+.coin.rest { transform: none !important; }
+.coin.rest .coinEdge { display: none; }
+.coin.rest .face { transform: none !important; box-shadow: 0 calc(var(--cs) * .04) 0 #b3761a; }
+.coin.rest[data-face="heads"] .back, .coin.rest[data-face="tails"] .front { display: none; }
 .stage.tossing { overflow: visible; }
 .tally { flex-basis: 100%; display: grid; gap: 6px; max-width: 420px; }
 .tallyBar { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--line); }
@@ -798,6 +804,11 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
   }
   // Which face each coin last showed, so the next toss starts from it.
   const coinShowing = [];
+  function restCoin(coin, deg) {
+    coin.style.transform = `rotateX(${deg}deg)`;
+    coin.dataset.face = deg === 0 ? 'heads' : 'tails';
+    coin.classList.add('rest');
+  }
 
   function dieNode(sides, value, size) {
     const wrap = el('div', 'dieWrap');
@@ -896,7 +907,7 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
       idle(body) {
         const { heads, tails } = this.opts();
         const w = coinNode(heads, tails, 150);
-        w.querySelector('.coin').style.transform = `rotateX(${coinShowing[0] || 0}deg)`;
+        restCoin(w.querySelector('.coin'), coinShowing[0] || 0);
         body.append(w);
         return `${heads} or ${tails}? Tap the coin to flip.`;
       },
@@ -943,8 +954,8 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
           const coin = w.querySelector('.coin'), toss = w.querySelector('.coinToss'), shadow = w.firstChild;
           const final = r.flips[i] ? 0 : 180, from = coinShowing[i] || 0;
           coinShowing[i] = final;
+          if (still) { restCoin(coin, final); return null; }
           coin.style.transform = `rotateX(${final}deg)`;
-          if (still) return null;
           const D = (n === 1 ? 1600 : 1250) + i * 60, delay = i * 60;
           const H = size * (n === 1 ? 1.1 : 0.9), tilt = (Math.random() - 0.5) * 30;
           const end = from + 360 * (n === 1 ? 4 : 3) + ((final - from + 360) % 360);
@@ -982,7 +993,7 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
             metal(s + D * 0.96 / 1000, 0.012 * v, 1560);
           }
           setTimeout(() => buzz(12), delay + D * 0.72);
-          return wait(delay + D);
+          return wait(delay + D).then(() => restCoin(coin, final));
         }));
         stage.classList.remove('tossing');
         if (tally) requestAnimationFrame(() => requestAnimationFrame(tally.fill));
