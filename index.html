@@ -181,19 +181,31 @@ svg.icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-w
 .note { display: block; font-size: .85rem; font-weight: 600; margin-top: 2px; }
 
 /* Coin */
-.coinWrap { --cs: 150px; position: relative; width: var(--cs); height: var(--cs); perspective: 900px; }
+.coinWrap { --cs: 150px; position: relative; width: var(--cs); height: var(--cs); perspective: 800px; cursor: pointer; -webkit-user-select: none; user-select: none; }
+.coinToss { position: absolute; inset: 0; transform-style: preserve-3d; }
 .coin { position: absolute; inset: 0; transform-style: preserve-3d; }
-.face {
-  position: absolute; inset: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2%; padding: 16%;
-  -webkit-backface-visibility: hidden; backface-visibility: hidden; text-align: center; font-family: var(--font-display); font-weight: 600; line-height: 1.05;
-  font-size: calc(var(--cs) * .14); overflow: hidden;
-}
-.face span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
-.face svg { width: 34%; height: 34%; flex: none; }
-.face.front { color: #7a4a06; background: radial-gradient(circle at 34% 28%, #fff4c9 0%, #ffd46b 34%, #f1ad2c 70%, #cf8914 100%); box-shadow: inset 0 0 0 calc(var(--cs) * .045) #f6bf45, inset 0 0 0 calc(var(--cs) * .06) #b8770f; }
-.face.back { color: #0d5c57; background: radial-gradient(circle at 34% 28%, #f0fffc 0%, #b6ece5 34%, #6ccac0 70%, #3b9f96 100%); box-shadow: inset 0 0 0 calc(var(--cs) * .045) #8fdcd3, inset 0 0 0 calc(var(--cs) * .06) #2e877f; transform: rotateY(180deg); }
-.face svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-.coinShadow { position: absolute; left: 12%; right: 12%; bottom: -14%; height: 10%; border-radius: 50%; background: rgba(0, 30, 40, .22); filter: blur(4px); }
+.coinEdge { position: absolute; inset: 1%; border-radius: 50%; background: #b3761a; }
+.coinEdge:nth-child(even) { background: #dca03a; }
+.face { position: absolute; inset: 0; border-radius: 50%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3%; padding: 22% 20% 16%; text-align: center; }
+.face.front { color: #7a4a06; }
+.face.back { color: #0c524d; }
+.face .art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.face::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(135deg, rgba(255, 255, 255, .5) 0%, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, .18) 100%); pointer-events: none; }
+.face .emb { position: relative; width: 30%; height: 30%; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .7)); }
+.face .lbl { position: relative; max-width: 100%; font-family: var(--font-display); font-weight: 700; font-size: calc(var(--cs) * .135); line-height: 1.05; text-shadow: 0 1px 0 rgba(255, 255, 255, .65); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.coinWrap.small .lbl { display: none; }
+.coinWrap.small .emb { width: 44%; height: 44%; }
+.coinWrap.small .face { padding: 0; }
+.coinShadow { position: absolute; left: 14%; right: 14%; bottom: -13%; height: 10%; border-radius: 50%; background: rgba(0, 30, 40, .25); filter: blur(4px); }
+.coinWrap:hover .coin { transition: translate .2s; translate: 0 -3px; }
+.stage.tossing { overflow: visible; }
+.tally { flex-basis: 100%; display: grid; gap: 6px; max-width: 420px; }
+.tallyBar { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--line); }
+.tallyBar span { transition: flex-grow .7s cubic-bezier(.3, 1.3, .5, 1); }
+.tallyBar .h { background: linear-gradient(180deg, #ffd46b, #e9a425); }
+.tallyBar .t { background: linear-gradient(180deg, #8fe0d6, #3b9f96); }
+.tallyLabels { display: flex; justify-content: space-between; font-weight: 800; font-size: .9rem; }
+.tallyLabels span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 48%; }
 
 /* Dice */
 .dieWrap { --ds: 104px; width: var(--ds); height: var(--ds); filter: drop-shadow(0 8px 10px rgba(0, 30, 40, .22)); }
@@ -394,6 +406,15 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
   <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v12M7.5 8 12 3.5 16.5 8"/><path d="M5 12.5v5A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-5"/></symbol>
   <symbol id="i-shell" viewBox="0 0 48 48"><path d="M24 40c-9 0-16-6-17-14C6 16 14 8 24 8s18 8 17 18c-1 8-8 14-17 14z"/><path d="M24 40 16 12M24 40l8-28M24 40 10 20M24 40l14-20M24 40V8"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></symbol>
+  <symbol id="i-palm" viewBox="0 0 24 24"><path d="M12.5 21c.4-3.5.2-7-1-10"/><path d="M11.5 11c-1.8-2.6-4.6-3.4-7.5-2.4M11.5 11c.6-2.9 2.9-4.6 6-4.5M11.5 11c-2.9-.2-5.1 1.4-6 4M11.5 11c2.7-.8 5.3.1 6.8 2.4M11.5 11c-.4-2.6-2-4.6-4.4-5.7"/><path d="M8 21h9"/></symbol>
+  <defs>
+    <linearGradient id="gRim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b5"/><stop offset=".45" stop-color="#e9ab35"/><stop offset="1" stop-color="#a2670f"/></linearGradient>
+    <radialGradient id="gGold" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#fff6d2"/><stop offset=".35" stop-color="#ffd66e"/><stop offset=".8" stop-color="#eeaa2c"/><stop offset="1" stop-color="#d08a16"/></radialGradient>
+    <radialGradient id="gSea" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#f2fffc"/><stop offset=".35" stop-color="#b3ebe3"/><stop offset=".8" stop-color="#5fc3b8"/><stop offset="1" stop-color="#3a9c93"/></radialGradient>
+    <path id="coinArc" d="M34 100a66 66 0 0 1 132 0"/>
+  </defs>
+  <symbol id="coin-heads" viewBox="0 0 200 200"><circle cx="100" cy="100" r="100" fill="url(#gRim)"/><circle cx="100" cy="100" r="92" fill="none" stroke="#fff5cc" stroke-width="3.4" stroke-dasharray="0 9.63" stroke-linecap="round" opacity=".85"/><circle cx="100" cy="100" r="85" fill="url(#gGold)" stroke="#a86c12" stroke-width="1.5"/><circle cx="100" cy="100" r="78" fill="none" stroke="#a86c12" stroke-opacity=".25"/><text font-family="Fredoka, sans-serif" font-weight="600" font-size="15" letter-spacing="4" fill="#8a560c" fill-opacity=".6"><textPath href="#coinArc" startOffset="50%" text-anchor="middle">SERENITY</textPath></text></symbol>
+  <symbol id="coin-tails" viewBox="0 0 200 200"><circle cx="100" cy="100" r="100" fill="url(#gRim)"/><circle cx="100" cy="100" r="92" fill="none" stroke="#fff5cc" stroke-width="3.4" stroke-dasharray="0 9.63" stroke-linecap="round" opacity=".85"/><circle cx="100" cy="100" r="85" fill="url(#gSea)" stroke="#a86c12" stroke-width="1.5"/><circle cx="100" cy="100" r="78" fill="none" stroke="#1f6f68" stroke-opacity=".25"/><text font-family="Fredoka, sans-serif" font-weight="600" font-size="15" letter-spacing="4" fill="#0c524d" fill-opacity=".55"><textPath href="#coinArc" startOffset="50%" text-anchor="middle">ISLAND MINT</textPath></text></symbol>
   <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2.5 9c2.4 0 2.4-2 4.75-2S9.6 9 12 9s2.4-2 4.75-2S19.1 9 21.5 9M2.5 15c2.4 0 2.4-2 4.75-2S9.6 15 12 15s2.4-2 4.75-2 2.35 2 4.75 2"/></symbol>
 </svg>
 
@@ -675,6 +696,31 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
       o.start(t); o.stop(t + d + 0.05);
     }
   }
+  // Bell-like metallic ping with inharmonic partials, for the coin.
+  function metal(delay, vol, base) {
+    const a = audio(); if (!a) return;
+    const t = a.currentTime + 0.01 + delay;
+    for (const [ratio, amp, d] of [[1, 1, 0.5], [2.76, 0.5, 0.3], [5.4, 0.25, 0.16], [8.93, 0.12, 0.09]]) {
+      const o = a.createOscillator(), g = a.createGain();
+      o.frequency.value = base * ratio;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol * amp, t + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(g).connect(a.destination);
+      o.start(t); o.stop(t + d + 0.05);
+    }
+  }
+  function whoosh(delay, dur, vol = 0.05) {
+    const a = audio(); if (!a) return;
+    const t = a.currentTime + 0.01 + delay, len = Math.floor(a.sampleRate * dur);
+    const buf = a.createBuffer(1, len, a.sampleRate), data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+    const src = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.Q.value = 0.9;
+    f.frequency.setValueAtTime(500, t); f.frequency.exponentialRampToValueAtTime(1800, t + dur * 0.4); f.frequency.exponentialRampToValueAtTime(450, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + dur * 0.35); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(f).connect(g).connect(a.destination); src.start(t);
+  }
   function clack(vol = 0.18) {
     const a = audio(); if (!a) return;
     const t = a.currentTime + 0.005, len = Math.floor(a.sampleRate * 0.04);
@@ -715,17 +761,43 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
   /* ---------- Modes ---------- */
   const PIPS = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
 
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  function svgUse(cls, id) {
+    const s = document.createElementNS(SVGNS, 'svg'), u = document.createElementNS(SVGNS, 'use');
+    s.setAttribute('class', cls);
+    s.setAttribute('viewBox', id.startsWith('coin-') ? '0 0 200 200' : '0 0 24 24');
+    u.setAttribute('href', '#' + id);
+    s.append(u);
+    return s;
+  }
+  // A minted coin with real thickness: stacked edge discs between two faces.
+  // It flips end over end (rotateX); 0deg shows heads, 180deg shows tails.
   function coinNode(heads, tails, size) {
-    const wrap = el('div', 'coinWrap');
+    const wrap = el('div', 'coinWrap' + (size < 80 ? ' small' : ''));
     wrap.style.setProperty('--cs', size + 'px');
-    const coin = el('div', 'coin');
-    const front = el('div', 'face front'), back = el('div', 'face back');
-    front.append(icon('i-sun'), el('span', '', heads));
-    back.append(icon('i-wave'), el('span', '', tails));
-    coin.append(front, back);
-    wrap.append(coin, el('div', 'coinShadow'));
+    const toss = el('div', 'coinToss'), coin = el('div', 'coin');
+    const thick = Math.max(4, size * 0.075), layers = size >= 100 ? 10 : 5;
+    for (let i = 0; i < layers; i++) {
+      const e = el('div', 'coinEdge');
+      e.style.transform = `translateZ(${(-thick / 2 + (thick * i) / (layers - 1)).toFixed(2)}px)`;
+      coin.append(e);
+    }
+    const face = (cls, art, emb, label, z) => {
+      const f = el('div', 'face ' + cls);
+      f.style.transform = z;
+      f.append(svgUse('art', art), svgUse('emb', emb), el('span', 'lbl', label));
+      return f;
+    };
+    coin.append(
+      face('front', 'coin-heads', 'i-sun', heads, `translateZ(${thick / 2}px)`),
+      face('back', 'coin-tails', 'i-palm', tails, `rotateX(180deg) translateZ(${thick / 2}px)`),
+    );
+    toss.append(coin);
+    wrap.append(el('div', 'coinShadow'), toss);
     return wrap;
   }
+  // Which face each coin last showed, so the next toss starts from it.
+  const coinShowing = [];
 
   function dieNode(sides, value, size) {
     const wrap = el('div', 'dieWrap');
@@ -823,37 +895,97 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
       goLabel() { const { n } = this.opts(); return n > 1 ? `Flip ${n} coins` : 'Flip the coin'; },
       idle(body) {
         const { heads, tails } = this.opts();
-        body.append(coinNode(heads, tails, 150));
-        return `${heads} or ${tails}?`;
+        const w = coinNode(heads, tails, 150);
+        w.querySelector('.coin').style.transform = `rotateX(${coinShowing[0] || 0}deg)`;
+        body.append(w);
+        return `${heads} or ${tails}? Tap the coin to flip.`;
       },
       compute() {
         const { heads, tails, n } = this.opts();
         const flips = Array.from({ length: n }, () => randInt(0, 1) === 0);
         const h = flips.filter(Boolean).length;
+        let streak = '';
+        if (n === 1) {
+          const label = flips[0] ? heads : tails;
+          let run = 1;
+          for (const e of store.history) { if (e.m === 'coin' && e.sub === 'Coin' && e.text === label) run++; else break; }
+          if (run >= 2) streak = `${label} ${run} times in a row`;
+        }
         return {
-          flips, heads, tails,
+          flips, heads, tails, note: streak,
           text: flips.map((f) => (f ? heads : tails)).join(', '),
           sub: n > 1 ? `${n} coins` : 'Coin',
           caption: n > 1 ? [[heads + ' ', String(h)], [` · ${tails} `, String(n - h)]] : [['', flips[0] ? heads : tails]],
         };
       },
       async render(body, r, animate) {
-        const size = r.flips.length === 1 ? 150 : r.flips.length <= 4 ? 96 : r.flips.length <= 9 ? 72 : 54;
-        const nodes = r.flips.map((f) => coinNode(r.heads, r.tails, size));
+        const n = r.flips.length;
+        const size = n === 1 ? 150 : n <= 4 ? 96 : n <= 9 ? 72 : 54;
+        const nodes = r.flips.map(() => coinNode(r.heads, r.tails, size));
         body.append(...nodes);
-        if (animate) note(1567.98, 0, 0.5, 0.05);
+        let tally = null;
+        if (n > 1) {
+          const h = r.flips.filter(Boolean).length;
+          tally = el('div', 'tally');
+          const bar = el('div', 'tallyBar'), hs = el('span', 'h'), ts = el('span', 't'), labels = el('div', 'tallyLabels');
+          hs.style.flexGrow = ts.style.flexGrow = 1;
+          bar.append(hs, ts);
+          const hl = el('span', '', r.heads), tl = el('span', '', r.tails);
+          labels.append(hl, tl);
+          tally.append(bar, labels);
+          body.append(tally);
+          tally.fill = () => { hs.style.flexGrow = h; ts.style.flexGrow = n - h; hl.textContent = `${r.heads} ${h}`; tl.textContent = `${r.tails} ${n - h}`; };
+        }
+        const still = !animate || reducedMotion.matches;
+        const stage = body.closest('.stage');
+        if (!still) stage.classList.add('tossing');
         await Promise.all(nodes.map((w, i) => {
-          const coin = w.firstChild, final = r.flips[i] ? 0 : 180;
-          coin.style.transform = `rotateY(${final}deg)`;
-          if (!animate || reducedMotion.matches) return null;
-          const dur = 1150 + i * 70, turns = 360 * (4 + (i % 2));
-          const opts = { duration: dur, easing: 'cubic-bezier(.15,.65,.25,1)' };
-          coin.animate([{ transform: 'rotateY(0deg)' }, { transform: `rotateY(${final + turns}deg)` }], opts);
-          w.animate([{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-45%) scale(1.1)', offset: 0.35 }, { transform: 'translateY(0) scale(1)' }], { duration: dur, easing: 'ease-in-out' });
-          w.lastChild.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.55)', opacity: 0.4, offset: 0.35 }, { transform: 'scale(1)', opacity: 1 }], { duration: dur, easing: 'ease-in-out' });
-          return wait(dur);
+          const coin = w.querySelector('.coin'), toss = w.querySelector('.coinToss'), shadow = w.firstChild;
+          const final = r.flips[i] ? 0 : 180, from = coinShowing[i] || 0;
+          coinShowing[i] = final;
+          coin.style.transform = `rotateX(${final}deg)`;
+          if (still) return null;
+          const D = (n === 1 ? 1600 : 1250) + i * 60, delay = i * 60;
+          const H = size * (n === 1 ? 1.1 : 0.9), tilt = (Math.random() - 0.5) * 30;
+          const end = from + 360 * (n === 1 ? 4 : 3) + ((final - from + 360) % 360);
+          const up = 'cubic-bezier(.2,.6,.35,1)', down = 'cubic-bezier(.55,0,.85,.35)';
+          const opts = { duration: D, delay, fill: 'backwards' };
+          toss.animate([
+            { transform: 'translateY(0) scale(1) rotateZ(0deg)', easing: up },
+            { transform: `translateY(${-H}px) scale(1.28) rotateZ(${tilt}deg)`, offset: 0.4, easing: down },
+            { transform: 'translateY(0) scale(1) rotateZ(0deg)', offset: 0.72, easing: up },
+            { transform: `translateY(${-H * 0.1}px) scale(1.02) rotateZ(0deg)`, offset: 0.82, easing: down },
+            { transform: 'translateY(0) scale(1) rotateZ(0deg)', offset: 0.9 },
+            { transform: 'translateY(0) scale(1) rotateZ(0deg)' },
+          ], opts);
+          coin.animate([
+            { transform: `rotateX(${from}deg) rotateY(0deg)`, easing: 'cubic-bezier(.3,.5,.45,1)' },
+            { transform: `rotateX(${end}deg) rotateY(0deg)`, offset: 0.72 },
+            { transform: `rotateX(${end + 10}deg) rotateY(8deg)`, offset: 0.8 },
+            { transform: `rotateX(${end - 5}deg) rotateY(-5deg)`, offset: 0.88 },
+            { transform: `rotateX(${end + 2}deg) rotateY(2deg)`, offset: 0.95 },
+            { transform: `rotateX(${end}deg) rotateY(0deg)` },
+          ], opts);
+          shadow.animate([
+            { transform: 'scale(1)', opacity: 1 },
+            { transform: 'scale(.45)', opacity: 0.3, offset: 0.4 },
+            { transform: 'scale(1)', opacity: 1, offset: 0.72 },
+            { transform: 'scale(.9)', opacity: 0.85, offset: 0.82 },
+            { transform: 'scale(1)', opacity: 1 },
+          ], opts);
+          if (i < 3) {
+            const s = (delay + 0) / 1000, v = i === 0 ? 1 : 0.5;
+            metal(s, 0.05 * v, 1900 + i * 60);
+            if (i === 0) whoosh(s + 0.05, D * 0.62 / 1000);
+            metal(s + D * 0.72 / 1000, 0.07 * v, 1480 + Math.random() * 80);
+            metal(s + D * 0.9 / 1000, 0.035 * v, 1520 + Math.random() * 80);
+            metal(s + D * 0.96 / 1000, 0.012 * v, 1560);
+          }
+          setTimeout(() => buzz(12), delay + D * 0.72);
+          return wait(delay + D);
         }));
-        if (animate) note(1318.51, 0, 0.35, 0.06);
+        stage.classList.remove('tossing');
+        if (tally) requestAnimationFrame(() => requestAnimationFrame(tally.fill));
       },
     },
 
@@ -1339,6 +1471,7 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
 
   /* ---------- Go ---------- */
   $('#goBtn').addEventListener('click', perform);
+  $('#stageBody').addEventListener('click', (e) => { if (mode === 'coin' && e.target.closest('.coinWrap')) perform(); });
   window.addEventListener('keydown', (e) => {
     if (e.code !== 'Space' || e.repeat) return;
     if (e.target.closest('input, textarea, select, button, [contenteditable], [role="dialog"]')) return;
