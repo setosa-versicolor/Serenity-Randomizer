@@ -245,9 +245,31 @@ svg.icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-w
 .pickCard.md { font-size: 1.45rem; }
 .pickCard.sm { font-size: 1.1rem; }
 .pickCard.placeholder { font-family: var(--font-body); font-size: 1.05rem; font-weight: 700; color: var(--muted); box-shadow: none; border-style: dashed; background: transparent; }
-.picks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; width: min(100%, 440px); counter-reset: pick; }
-.picks li { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 14px; background: var(--card-strong); border: 1px solid var(--line); font-weight: 700; overflow-wrap: anywhere; }
-.picks li::before { counter-increment: pick; content: counter(pick); flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--teal-soft); color: var(--teal); font-size: .85rem; }
+.listStage { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; }
+.reel { --row: 52px; position: relative; width: min(100%, 360px); height: calc(var(--row) * 5); perspective: 700px; }
+.reelWindow { position: absolute; inset: 0; overflow: hidden; -webkit-mask-image: linear-gradient(transparent, #000 26%, #000 74%, transparent); mask-image: linear-gradient(transparent, #000 26%, #000 74%, transparent); }
+.reelBand { position: absolute; left: 0; right: 0; top: 50%; height: var(--row); margin-top: calc(var(--row) / -2); border-radius: 18px; background: var(--teal-soft); border: 2px solid var(--teal); }
+.reelBand::before, .reelBand::after { content: ""; position: absolute; top: 50%; margin-top: -9px; border: 9px solid transparent; }
+.reelBand::before { left: -4px; border-left: 12px solid var(--coral); }
+.reelBand::after { right: -4px; border-right: 12px solid var(--coral); }
+.reelRow {
+  position: absolute; left: 14px; right: 14px; top: 50%; height: calc(var(--row) - 8px); margin-top: calc((var(--row) - 8px) / -2);
+  display: flex; align-items: center; gap: 10px; padding: 0 16px; border-radius: 14px; font-weight: 800; font-size: 1.1rem;
+  background: color-mix(in srgb, var(--c) 20%, var(--card-strong)); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+  -webkit-backface-visibility: hidden; backface-visibility: hidden; will-change: transform, opacity;
+}
+.reelRow .dot { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
+.reelRow .txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reelRow.taken { filter: grayscale(1); }
+.reelRow.taken .txt { text-decoration: line-through; }
+.reelRow.win { background: var(--c); border-color: var(--c); color: #0f2a33; box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 35%, transparent), 0 12px 30px -8px var(--c); animation: winPop .5s cubic-bezier(.3, 1.6, .5, 1); }
+.reelRow.win .dot { background: #fff; }
+@keyframes winPop { 0% { scale: .92; } 100% { scale: 1; } }
+.confetti { position: absolute; left: 50%; top: 50%; width: 8px; height: 12px; margin: -6px 0 0 -4px; border-radius: 2px; pointer-events: none; }
+.pickTray { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; min-height: 38px; }
+.trayPill { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 5px 14px 5px 5px; border-radius: 999px; font-weight: 800; background: color-mix(in srgb, var(--c) 22%, var(--card-strong)); border: 1px solid color-mix(in srgb, var(--c) 50%, transparent); animation: tagIn .35s cubic-bezier(.3, 1.6, .5, 1); }
+.trayPill b { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--c); color: #0f2a33; font-size: .8rem; }
+.trayPill span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .shake { animation: shake .4s; }
 @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
 
@@ -282,6 +304,20 @@ textarea.input { min-height: 132px; resize: vertical; line-height: 1.5; }
 .switch input:checked { background: var(--teal); }
 .switch input:checked::after { transform: translateX(20px); }
 .hint { font-size: .85rem; color: var(--muted); margin: 0; }
+.tagBox { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 56px; padding: 8px; border: 1px solid var(--field-line); border-radius: var(--r-sm); background: var(--field); cursor: text; transition: border-color .2s, box-shadow .2s; }
+.tagBox:focus-within { border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-soft); }
+.tag { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; padding: 2px 2px 2px 12px; border-radius: 999px; font-weight: 800; font-size: .95rem; cursor: default; background: color-mix(in srgb, var(--c) 22%, var(--card-strong)); border: 1px solid color-mix(in srgb, var(--c) 55%, transparent); animation: tagIn .28s cubic-bezier(.3, 1.6, .5, 1); }
+.tag .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tag button { flex: none; width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 1.15rem; line-height: 1; }
+.tag button:hover { background: color-mix(in srgb, var(--c) 35%, transparent); color: var(--ink); }
+.tagEntry { display: flex; flex: 1 1 160px; min-width: 0; align-items: center; gap: 6px; }
+.tagInput { flex: 1; min-width: 0; min-height: 36px; border: 0; background: transparent; outline: none; padding: 4px 6px; font-size: 1rem; }
+.tagInput::placeholder { color: var(--muted); opacity: .75; }
+.addBtn { flex: none; min-height: 34px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--teal); color: #fff; font-weight: 800; }
+[data-theme="dark"] .addBtn { color: #062a2a; }
+.hintRow { display: flex; justify-content: space-between; align-items: center; min-height: 28px; }
+.hintRow .textBtn { padding: 4px 8px; font-size: .85rem; }
+@keyframes tagIn { from { scale: .5; opacity: 0; } to { scale: 1; opacity: 1; } }
 .savedLists { display: flex; flex-wrap: wrap; gap: 8px; }
 .savedList { display: inline-flex; align-items: center; border-radius: 999px; background: var(--teal-soft); color: var(--teal); font-weight: 800; }
 .savedList button { border: 0; background: none; color: inherit; min-height: 38px; }
@@ -487,9 +523,12 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
 
         <div class="panelBody" role="tabpanel" id="panel-list" aria-labelledby="tab-list" data-panel="list" hidden>
           <div class="savedLists" id="savedLists" aria-label="Saved lists"></div>
-          <div class="field"><label for="listItems">Options, one per line</label>
-            <textarea class="input" id="listItems" data-persist placeholder="Mango smoothie&#10;Beach walk&#10;Hammock nap&#10;Snorkeling"></textarea>
-            <p class="hint" id="listHint"></p>
+          <div class="field"><label for="listDraft">Your choices</label>
+            <div class="tagBox" id="tagBox" role="group" aria-label="List options">
+              <div class="tagEntry"><input class="tagInput" id="listDraft" type="text" maxlength="60" enterkeyhint="enter" autocomplete="off" placeholder="Type an option, press Enter"><button type="button" class="addBtn" id="addTagBtn" hidden>Add</button></div>
+            </div>
+            <textarea id="listItems" data-persist hidden></textarea>
+            <div class="hintRow"><p class="hint" id="listHint"></p><button type="button" class="textBtn" id="clearTagsBtn" hidden>Clear all</button></div>
           </div>
           <div class="grid2">
             <div class="field"><span class="fieldLabel" id="listCountLabel">How many to pick</span>
@@ -705,6 +744,76 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
   }
   const diceSize = (n) => (n === 1 ? 112 : n <= 3 ? 86 : n <= 6 ? 66 : n <= 12 ? 52 : 42);
 
+  /* ---------- List reel ---------- */
+  const TAG_COLORS = ['#ff8a63', '#2fc1b3', '#ffc24b', '#5aa7ff', '#5fcf8a', '#c79bff', '#ff7fb0'];
+  const tagColor = (i) => TAG_COLORS[i % TAG_COLORS.length];
+
+  // A vertical drum of pills; pos is a (fractional) item index at the centre band.
+  function makeReel(items) {
+    const n = items.length, root = el('div', 'reel'), win = el('div', 'reelWindow'), rows = [];
+    root.setAttribute('aria-hidden', 'true');
+    root.append(el('div', 'reelBand'), win);
+    for (let j = 0; j < 7; j++) {
+      const row = el('div', 'reelRow');
+      row.append(el('span', 'dot'), el('span', 'txt'));
+      win.append(row); rows.push(row);
+    }
+    const rowH = 52, taken = new Set();
+    let pos = 0;
+    const mod = (k) => ((k % n) + n) % n;
+    function setPos(p) {
+      pos = p;
+      const base = Math.round(p);
+      rows.forEach((row, j) => {
+        const k = base + j - 3, d = k - p, i = mod(k), ad = Math.min(Math.abs(d), 3);
+        if (row._i !== i) { row._i = i; row.lastChild.textContent = items[i]; row.style.setProperty('--c', tagColor(i)); }
+        row.classList.toggle('taken', taken.has(i));
+        row.classList.remove('win');
+        row.style.transform = `translateY(${(d * rowH).toFixed(1)}px) rotateX(${(-d * 18).toFixed(1)}deg) scale(${(1 - ad * 0.06).toFixed(3)})`;
+        row.style.opacity = Math.max(0, 1 - ad * 0.3).toFixed(2);
+      });
+    }
+    function spinTo(target, duration, loops) {
+      const start = pos, base = Math.round(start) + Math.max(n * loops, 12);
+      const end = base + mod(target - base);
+      let lastRow = Math.round(start), lastTick = 0;
+      return new Promise((resolve) => {
+        const t0 = performance.now();
+        (function frame(now) {
+          const t = Math.min(1, (now - t0) / duration), e = 1 - Math.pow(1 - t, 4);
+          setPos(start + (end - start) * e);
+          const r = Math.round(pos);
+          if (r !== lastRow) {
+            lastRow = r;
+            if (now - lastTick > 40) { lastTick = now; tick(); if (t > 0.6) buzz(3); }
+          }
+          if (t < 1) requestAnimationFrame(frame); else { setPos(end); resolve(); }
+        })(t0);
+      });
+    }
+    return {
+      el: root, setPos, spinTo,
+      take(i) { taken.add(i); setPos(pos); },
+      win() { const row = rows[3]; row.classList.remove('taken'); void row.offsetWidth; row.classList.add('win'); },
+    };
+  }
+
+  function burst(host) {
+    if (reducedMotion.matches || !host.animate) return;
+    for (let i = 0; i < 28; i++) {
+      const c = el('span', 'confetti');
+      c.style.background = TAG_COLORS[i % TAG_COLORS.length];
+      host.append(c);
+      const a = Math.random() * Math.PI * 2, d = 70 + Math.random() * 110;
+      const x = Math.cos(a) * d * 1.4, y = Math.sin(a) * d * 0.8 - 30;
+      c.animate([
+        { transform: 'translate(0,0) rotate(0) scale(.6)', opacity: 1 },
+        { transform: `translate(${x}px, ${y}px) rotate(${Math.random() * 540 - 270}deg) scale(1)`, opacity: 1, offset: 0.55 },
+        { transform: `translate(${x * 1.1}px, ${y + 90}px) rotate(${Math.random() * 720}deg) scale(.9)`, opacity: 0 },
+      ], { duration: 1100 + Math.random() * 500, easing: 'cubic-bezier(.2,.7,.3,1)' }).onfinish = () => c.remove();
+    }
+  }
+
   const MODES = {
     coin: {
       title: 'Coin flip', icon: 'i-coin',
@@ -869,32 +978,63 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
       goLabel() { const { n } = this.opts(); return n > 1 ? `Pick ${n}` : 'Pick one'; },
       idle(body) {
         const { items } = this.opts();
-        body.append(el('div', 'pickCard placeholder', items.length ? `${items.length} option${items.length > 1 ? 's' : ''} ready` : 'Add a few options below'));
-        return items.length ? 'Ready when you are' : 'One option per line';
+        if (!items.length) {
+          body.append(el('div', 'pickCard placeholder', 'Add a few options below'));
+          return 'Each option becomes a pill on the reel';
+        }
+        const stage = el('div', 'listStage'), reel = makeReel(items);
+        stage.append(reel.el);
+        body.append(stage);
+        reel.setPos(0);
+        return `${items.length} option${items.length > 1 ? 's' : ''} on the reel`;
       },
       compute() {
         const { items, unique } = this.opts();
         let { n } = this.opts(), hint = '';
-        if (!items.length) return { error: 'Your list is empty. Type some options first.' };
+        if (!items.length) return { error: 'Your list is empty. Add some options first.' };
         if (unique && n > items.length) { hint = `There are only ${items.length} options, so all of them were picked.`; n = items.length; }
-        const picks = unique
-          ? uniqueInts(0, items.length - 1, n).map((i) => items[i])
-          : Array.from({ length: n }, () => pick(items));
+        const idx = unique ? uniqueInts(0, items.length - 1, n) : Array.from({ length: n }, () => randInt(0, items.length - 1));
+        const picks = idx.map((i) => items[i]);
         return {
-          items, picks, note: hint,
+          items, idx, picks, unique, note: hint,
           text: picks.join(', '),
           sub: activeListName() || 'List',
-          caption: n > 1 ? [[`${n} picks from ${items.length} options`, '']] : [[`Picked from ${items.length} option${items.length > 1 ? 's' : ''}`, '']],
+          caption: n > 1 ? [[`${n} picks from ${items.length} options`, '']] : [['Picked from ', `${items.length} option${items.length > 1 ? 's' : ''}`]],
         };
       },
       async render(body, r, animate) {
-        const single = r.picks.length === 1;
-        let nodes;
-        if (single) { nodes = [el('div', 'pickCard')]; body.append(nodes[0]); }
-        else { const ol = el('ol', 'picks'); nodes = r.picks.map(() => el('li')); ol.append(...nodes); body.append(ol); }
-        if (animate) await spin(1100, () => { nodes.forEach((n) => (n.textContent = pick(r.items))); tick(); });
-        nodes.forEach((n, i) => { n.textContent = r.picks[i]; if (single) n.className = 'pickCard ' + sizeClass(r.picks[i]); if (animate) landIn(n); });
-        if (animate) chime();
+        const stage = el('div', 'listStage'), reel = makeReel(r.items);
+        const tray = r.idx.length > 1 ? el('div', 'pickTray') : null;
+        stage.append(reel.el);
+        if (tray) stage.append(tray);
+        body.append(stage);
+        const addToTray = (i, k) => {
+          const p = el('span', 'trayPill');
+          p.style.setProperty('--c', tagColor(i));
+          p.append(el('b', '', String(k + 1)), el('span', '', r.items[i]));
+          tray.append(p);
+        };
+        if (!animate || reducedMotion.matches) {
+          reel.setPos(r.idx[r.idx.length - 1]);
+          if (r.unique) r.idx.slice(0, -1).forEach((i) => reel.take(i));
+          reel.win();
+          if (tray) r.idx.forEach(addToTray);
+          return;
+        }
+        reel.setPos(randInt(0, r.items.length - 1));
+        const quick = r.idx.length > 5;
+        for (let k = 0; k < r.idx.length; k++) {
+          if (k > 0 && r.unique) reel.take(r.idx[k - 1]);
+          await reel.spinTo(r.idx[k], k === 0 ? 2600 : quick ? 900 : 1500, k === 0 ? 3 : 1);
+          reel.win();
+          if (tray) addToTray(r.idx[k], k);
+          const last = k === r.idx.length - 1;
+          note(last ? 783.99 : 659.25, 0, 0.5, 0.08);
+          buzz(8);
+          if (!last) await wait(quick ? 250 : 450);
+        }
+        burst(reel.el);
+        chime();
       },
     },
   };
@@ -944,12 +1084,13 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
   async function perform() {
     if (busy) return;
     const m = MODES[mode];
+    if (mode === 'list') commitDraft();
     const r = m.compute();
     if (r.error) {
       setCaption(r.error, '', true);
       body.classList.remove('shake'); void body.offsetWidth; body.classList.add('shake');
       buzz([20, 40, 20]);
-      if (mode === 'list') $('#listItems').focus({ preventScroll: false });
+      if (mode === 'list') $('#listDraft').focus();
       return;
     }
     busy = true;
@@ -1027,7 +1168,7 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
     const nameInput = $('#listName');
     const name = nameInput.value.trim();
     const items = MODES.list.items();
-    if (!items.length) { toast('Add some options first'); $('#listItems').focus(); return; }
+    if (!items.length) { toast('Add some options first'); $('#listDraft').focus(); return; }
     if (!name) { toast('Give the list a name'); nameInput.focus(); return; }
     store.lists[name] = items.join('\n');
     save(); renderSavedLists();
@@ -1036,10 +1177,84 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
   });
   $('#listName').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $('#saveListBtn').click(); } });
   function onListChange() {
-    const n = MODES.list.items().length;
-    $('#listHint').textContent = n ? `${n} option${n > 1 ? 's' : ''}` : '';
-    if (mode === 'list' && !lastResult.list) showIdle();
+    const items = MODES.list.items();
+    const box = $('#tagBox'), entry = box.lastElementChild;
+    // Swap the pills in front of the text box without moving it, so typing keeps focus.
+    box.querySelectorAll('.tag').forEach((t) => t.remove());
+    const tags = items.map((text, i) => {
+      const tag = el('span', 'tag');
+      tag.style.setProperty('--c', tagColor(i));
+      tag.title = text;
+      const rm = el('button', '', '×');
+      rm.type = 'button';
+      rm.setAttribute('aria-label', `Remove ${text}`);
+      rm.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setItems(items.filter((_, k) => k !== i));
+        $('#listDraft').focus();
+      });
+      tag.append(el('span', 't', text), rm);
+      return tag;
+    });
+    entry.before(...tags);
+    const n = items.length;
+    $('#listHint').textContent = n ? `${n} option${n > 1 ? 's' : ''}` : 'Press Enter after each one. Pasting a list works too.';
+    $('#clearTagsBtn').hidden = !n;
+    delete lastResult.list;
+    if (mode === 'list' && !busy) showIdle();
   }
+  function setItems(items) {
+    const ta = $('#listItems');
+    ta.value = items.join('\n');
+    saveField(ta);
+    onListChange();
+  }
+  function addItems(texts) {
+    const clean = texts.map((t) => t.trim()).filter(Boolean);
+    if (clean.length) setItems([...MODES.list.items(), ...clean]);
+  }
+  function commitDraft() {
+    const d = $('#listDraft');
+    const text = d.value;
+    if (!text.trim()) return;
+    d.value = '';
+    addItems([text]);
+    $('#addTagBtn').hidden = true;
+  }
+  const draft = $('#listDraft');
+  draft.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); commitDraft(); }
+    else if (e.key === 'Backspace' && !draft.value) {
+      const items = MODES.list.items();
+      if (!items.length) return;
+      e.preventDefault();
+      draft.value = items.pop();
+      setItems(items);
+      draft.focus();
+      $('#addTagBtn').hidden = false;
+    }
+  });
+  draft.addEventListener('input', () => {
+    // Some mobile keyboards insert newlines instead of firing Enter.
+    if (/[\r\n]/.test(draft.value)) { const parts = draft.value.split(/\r?\n/); draft.value = parts.pop(); addItems(parts); }
+    $('#addTagBtn').hidden = !draft.value.trim();
+  });
+  draft.addEventListener('paste', (e) => {
+    const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
+    if (!/[\r\n]/.test(text)) return;
+    e.preventDefault();
+    addItems(text.split(/\r?\n/));
+  });
+  draft.addEventListener('blur', commitDraft);
+  $('#addTagBtn').addEventListener('mousedown', (e) => e.preventDefault());
+  $('#addTagBtn').addEventListener('click', () => { commitDraft(); draft.focus(); });
+  $('#tagBox').addEventListener('click', (e) => { if (e.target === e.currentTarget) draft.focus(); });
+  $('#clearTagsBtn').addEventListener('click', () => {
+    const prev = MODES.list.items();
+    setItems([]);
+    toast(`Cleared ${prev.length} option${prev.length > 1 ? 's' : ''}`);
+    draft.focus();
+  });
 
   /* ---------- Copy / share / toast ---------- */
   let toastTimer;
@@ -1083,11 +1298,11 @@ kbd { font-family: inherit; padding: 1px 6px; border-radius: 6px; border: 1px so
     saveField(t);
     if (t.name === 'theme') applyTheme();
     if (t.name === 'dieType') $('#customSidesWrap').hidden = t.value !== 'custom';
-    if (t.id === 'listItems') onListChange();
+    if (t.id === 'listDraft') return;
     if (t.closest('[data-panel]')) {
       updateGoLabel();
       // Keep the idle preview in sync (e.g. coin labels, die type) until the first result.
-      if (!lastResult[mode] && t.id !== 'listItems') showIdle();
+      if (!lastResult[mode]) showIdle();
     }
   });
   // Clamp step counts when the user leaves the field.
